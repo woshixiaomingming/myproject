@@ -1,19 +1,22 @@
 package com.util;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.druid.pool.DruidPooledConnection;
+import org.apache.log4j.Logger;
+
+import javax.sql.DataSource;
 
 public class Connection {
 
-    public static DruidPooledConnection getConnection (String db) {
+    private static Logger logger = Logger.getLogger(Connection.class);
+
+    public static java.sql.Connection getConnection (String db) {
         try {
-            DruidDataSource druidDataSource = DataSource.getDataSource(db);
-            DruidPooledConnection connection = druidDataSource.getConnection();
+            DataSource druidDataSource = MyDataSource.getDataSource(db);
+            java.sql.Connection connection = druidDataSource.getConnection();
             return connection;
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error("无法与数据库建立连接:" + e);
             throw new RuntimeException("无法与数据库建立连接");
         }
     }
-
 }
