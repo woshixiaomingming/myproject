@@ -1,9 +1,11 @@
 package com.util;
 
-public class ConnectProp {
+import java.io.Serializable;
+
+public class ConnectProp implements Serializable {
 
     public String ip;
-    public String db;
+    public String db = "main";
     public String username;
     public String password;
 
@@ -12,5 +14,9 @@ public class ConnectProp {
         this.db = db;
         this.username = username;
         this.password = password;
+    }
+
+    public ConnectProp () {
+
     }
 }

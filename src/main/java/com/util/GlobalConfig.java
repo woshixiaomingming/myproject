@@ -28,7 +28,7 @@ public class GlobalConfig {
                 getInstance();
             }
             try {
-                return null;
+                return rb.getString(key) == null ? null : rb.getString(key);
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
