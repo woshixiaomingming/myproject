@@ -28,7 +28,7 @@ public class ResultPraseBean {
             while (resultSet.next()) {
                 T obj = classEntity.newInstance();
                 for (int i = 0; i < column; i++) {
-                    String label = data.getColumnLabel(i) == null ? data.getColumnName(i) : data.getColumnLabel(i);
+                    String label = data.getColumnLabel(i + 1) == null ? data.getColumnName(i + 1) : data.getColumnLabel(i + 1);
                     Field field = getModelField(db, classEntity, label);
                     if (field == null) {
                         continue;
@@ -42,12 +42,12 @@ public class ResultPraseBean {
                 }
                 dataBean.add(obj);
             }
+            return dataBean;
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("结果集转换异常");
             return null;
         }
-        return null;
     }
 
     public static Field getModelField (String db, Class<?> classEntity, String label) {
