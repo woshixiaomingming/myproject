@@ -25,32 +25,50 @@ public class Data {
         try {
             connection = com.util.Connection.getConnection(db);
             statement = connection.prepareStatement(sql);
-            //SQLParamHelper.setParam(param, statement);
+            SQLParamHelper.setParam(param, statement);
             resultSet = statement.executeQuery();
-            query = ResultPraseBean.getResultPraseBean(resultSet, classEntity, db);
+            if (resultSet == null)
+                query = null;
+            else
+                query = ResultPraseBean.getResultPraseBean(resultSet, classEntity, db);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("使用当前数据源" + db + "的连接异常");
         } finally {
-            try {
-                if (resultSet != null) {
-                    resultSet.close();
-                    resultSet = null;
-                }
-                if (statement != null) {
-                    statement.close();
-                    statement = null;
-                }
-                if (connection != null) {
-                    connection.close();
-                    connection = null;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.error("关闭数据源" + db + "数据库连接异常：" + e);
-            }
+            com.util.Connection.closeConnection(connection, resultSet, statement);
         }
         return query;
+    }
+
+    /**
+     *
+     * @param sql
+     * @param param
+     * @param db
+     * @param classEntity
+     * @param <T>
+     * @return
+     */
+    public static <T extends Bean> int update (String sql, Object[] param, String db, Class<T> classEntity) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        int result = -1;
+        try {
+            connection = com.util.Connection.getConnection(db);
+            statement = connection.prepareStatement(sql);
+            SQLParamHelper.setParam(param, statement);
+            result = statement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("使用当前数据源" + db + "的连接异常");
+        } finally {
+            com.util.Connection.closeConnection(connection, null, statement);
+        }
+        return result;
+    }
+
+    public static <T extends Bean> int updateTrans (List<> sql, Object[] param, String db, Class<T> classEntity) {
+
     }
 
 }
