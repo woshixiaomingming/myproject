@@ -12,7 +12,7 @@ public class MyDataSource {
     private static ConcurrentHashMap<String, DataSource> datasource = new ConcurrentHashMap<String, DataSource>();
     private static ConcurrentHashMap<String, ConnectProp> connectProp = new ConcurrentHashMap<String, ConnectProp>();
 
-    public static javax.sql.DataSource getDataSource (String db) {
+    public synchronized static javax.sql.DataSource getDataSource (String db) {
         javax.sql.DataSource dataSource = datasource.get(db);
         if (dataSource == null) {
             ConnectProp connectProp = initConnectProp(db);
@@ -32,7 +32,7 @@ public class MyDataSource {
     public synchronized static javax.sql.DataSource setDataSource (String ip, String db, String username, String password) {
         DruidDataSource druidDataSource = new DruidDataSource();
         druidDataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        druidDataSource.setUrl("jdbc:mysql://" + ip + "/" + db + "?useUnicode=true&amp;characterEncoding=UTF-8");
+        druidDataSource.setUrl("jdbc:mysql://" + ip + "/" + db + "?useUnicode=true&characterEncoding=UTF-8");
         druidDataSource.setUsername(username);
         druidDataSource.setPassword(password);
         druidDataSource.setInitialSize(5);
