@@ -18,7 +18,7 @@ public class SQLParamHelper {
      * @param statement
      * @return
      */
-    public static PreparedStatement setParam (Object[] param, PreparedStatement statement) {
+    public static void setParam (Object[] param, PreparedStatement statement) {
         try {
             if (param != null && param.length > 0) {
                 for (int i = 0, size = param.length; i < size; i++) {
@@ -68,11 +68,9 @@ public class SQLParamHelper {
                     }
                 }
             }
-            return statement;
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("导入数据失败");
-            return null;
+            logger.error("数据插入sql失败");
         }
     }
 }
