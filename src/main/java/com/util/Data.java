@@ -57,8 +57,6 @@ public class Data {
      * @param sql
      * @param param
      * @param db
-     * @param classEntity
-     * @param <T>
      * @return
      */
     public static int update (String sql, Object[] param, String db) {
@@ -143,5 +141,10 @@ public class Data {
         } finally {
             com.util.Connection.closeConnection(connection, null, statement);
         }
+    }
+
+    public static <T extends Bean> T GetOne (String sql, Object[] param, Class<T> classEntity) {
+        List<T> object = QueryT(sql, param, classEntity);
+        return object == null || object.size() < 1 ? null : object.get(0);
     }
 }
