@@ -144,4 +144,9 @@ public class Data {
             com.util.Connection.closeConnection(connection, null, statement);
         }
     }
+
+    public static <T extends Bean> T GetOne (String sql, Object[] param, Class<T> classEntity) {
+        List<T> object = QueryT(sql, param, classEntity);
+        return object == null || object.size() == 0 ? null : object.get(0);
+    }
 }
