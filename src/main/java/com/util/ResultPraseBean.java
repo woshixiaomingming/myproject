@@ -3,6 +3,7 @@ package com.util;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
@@ -36,6 +37,18 @@ public class ResultPraseBean {
                     Object result = resultSet.getObject(label);
                     if (result == null) {
                         continue;
+                    }
+                    if((field.getType() == BigDecimal.class) && !(result instanceof BigDecimal)){
+                        result = new BigDecimal(result.toString());
+                    }else if((field.getType() == Long.class || field.getType() == long.class) && !(result instanceof Long)){
+                        result = Long.parseLong(result.toString());
+                    }else if((field.getType() == Integer.class || field.getType() == int.class) && !(result instanceof Integer)){
+                        result = Integer.parseInt(result.toString());
+                    }else if((field.getType() == boolean.class || field.getType() == Boolean.class) && !(result instanceof Boolean)){
+                        boolean r = result.toString().equals("1") || result.toString().equals("true");
+                        result = r;
+                    }else if((field.getType() == String.class) && !(result instanceof String)){
+                        result = result.toString();
                     }
                     field.setAccessible(true);
                     field.set(obj, result);

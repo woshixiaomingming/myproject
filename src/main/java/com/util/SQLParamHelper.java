@@ -59,7 +59,11 @@ public class SQLParamHelper {
                         statement.setLong(i + 1, Long.valueOf(param[i].toString()));
                     }
                     if (Boolean.class.isInstance(param[i])) {
-                        statement.setBoolean(i + 1, Boolean.parseBoolean(param[i].toString()));
+                        if (param[i].equals(true)) {
+                            statement.setInt(i + 1, 1);
+                        } else {
+                            statement.setInt(i + 1, 0);
+                        }
                     }
                     if (param[i] != null) {
                         statement.setString(i + 1, String.valueOf(param[i]));
