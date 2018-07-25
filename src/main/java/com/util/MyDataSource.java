@@ -12,14 +12,21 @@ public class MyDataSource {
     private static ConcurrentHashMap<String, DataSource> datasource = new ConcurrentHashMap<String, DataSource>();
     private static ConcurrentHashMap<String, ConnectProp> connectProp = new ConcurrentHashMap<String, ConnectProp>();
 
-    public synchronized static javax.sql.DataSource getDataSource (String db) {
+    public synchronized static javax.sql.DataSource getDataSource (DataSql db) {
         javax.sql.DataSource dataSource = datasource.get(db);
         if (dataSource == null) {
-            ConnectProp connectProp = initConnectProp(db);
+            ConnectProp connectProp = null;
+            if (db.isConfig()) {
+                //默认从配置文件取
+                connectProp = initConnectProp(db.getDataDB());
+            } else {
+                //从注解中获取相应的配置信息
+                connectProp = initConnectProp(db);
+            }
             if (connectProp != null) {
                 //初始化最新的数据库连接
                 javax.sql.DataSource druidDataSource = setDataSource(connectProp.ip, connectProp.db, connectProp.username, connectProp.password);
-                datasource.put(db, druidDataSource);
+                datasource.put(db.getDataDB(), druidDataSource);
                 return druidDataSource;
             } else {
                 logger.error("未找到当前的数据源");
@@ -60,6 +67,23 @@ public class MyDataSource {
                 }
             } else {
                 return connectProp.get(db);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("获取数据源的信息产生异常" +  e);
+            return null;
+        }
+    }
+
+    public static ConnectProp initConnectProp (DataSql dataSql) {
+        ConnectProp connectProp1 = null;
+        try {
+            if (null == connectProp.get(dataSql.getDataDB())) {
+                connectProp1 = new ConnectProp(dataSql.getDataIp(), dataSql.getDataDB(), dataSql.getUsername(), dataSql.getPassword());
+                connectProp.put(dataSql.getDataDB(), connectProp1);
+                return connectProp1;
+            } else {
+                return connectProp.get(dataSql);
             }
         } catch (Exception e) {
             e.printStackTrace();

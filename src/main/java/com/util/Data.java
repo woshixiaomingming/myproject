@@ -8,44 +8,43 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Data {
+public class Data extends DataSql {
 
     private static Logger logger = Logger.getLogger(Data.class);
-    public static String db = "main";
 
-    public static  <T extends Bean> List<T> QueryT (String sql, Object[] param, Class<T> classEntity) {
-        return QueryT(sql, param, db, classEntity);
+    public <T extends Bean> List<T> QueryT (String sql, Object[] param) {
+        return QueryT(sql, param, getDataDB(), getClassEntity());
     }
 
-    public static int insert (String sql, Object[] param) {
-        return insert(sql, param, db);
+    public int insert (String sql, Object[] param) {
+        return insert(sql, param, getDataDB());
     }
 
-    public static int update (String sql, Object[] param) {
-        return update(sql, param, db);
+    public int update (String sql, Object[] param) {
+        return update(sql, param, getDataDB());
     }
 
-    public static boolean doTrans (List<Allsql> sql) {
-        return doTrans(sql, db);
+    public boolean doTrans (List<Allsql> sql) {
+        return doTrans(sql, getDataDB());
     }
 
-    public static <T extends Bean> List<T> QueryT (String sql, Object[] param, String db, Class<T> classEntity) {
+    public <T extends Bean> List<T> QueryT (String sql, Object[] param, String dataDB, Class<T> classEntity) {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         List<T> query = new ArrayList<T>();
         try {
-            connection = com.util.Connection.getConnection(db);
+            connection = com.util.Connection.getConnection(dataDB);
             statement = connection.prepareStatement(sql);
             SQLParamHelper.setParam(param, statement);
             resultSet = statement.executeQuery();
             if (resultSet == null)
                 query = null;
             else
-                query = ResultPraseBean.getResultPraseBean(resultSet, classEntity, db);
+                query = ResultPraseBean.getResultPraseBean(resultSet, classEntity, dataDB);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("使用当前数据源" + db + "的连接异常");
+            logger.error("使用当前数据源" + dataDB + "的连接异常");
         } finally {
             com.util.Connection.closeConnection(connection, resultSet, statement);
         }
@@ -56,32 +55,32 @@ public class Data {
      *
      * @param sql
      * @param param
-     * @param db
+     * @param dataDB
      * @return
      */
-    public static int update (String sql, Object[] param, String db) {
+    public int update (String sql, Object[] param, String dataDB) {
         Connection connection = null;
         PreparedStatement statement = null;
         int result = -1;
         try {
-            connection = com.util.Connection.getConnection(db);
+            connection = com.util.Connection.getConnection(dataDB);
             statement = connection.prepareStatement(sql);
             SQLParamHelper.setParam(param, statement);
             result = statement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("使用当前数据源" + db + "的连接异常");
+            logger.error("使用当前数据源" + dataDB + "的连接异常");
         } finally {
             com.util.Connection.closeConnection(connection, null, statement);
         }
         return result;
     }
 
-    public static boolean doTrans (List<Allsql> sql, String db) {
+    public boolean doTrans (List<Allsql> sql, String dataDB) {
         Connection connection = null;
         PreparedStatement statement = null;
         try {
-            connection = com.util.Connection.getConnection(db);
+            connection = com.util.Connection.getConnection(dataDB);
             connection.setAutoCommit(false);
             for (Allsql sqls : sql) {
                  statement = connection.prepareStatement(sqls.getSql());
@@ -99,7 +98,7 @@ public class Data {
             connection.commit();
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("使用当前数据源" + db + "的连接异常");
+            logger.error("使用当前数据源" + dataDB + "的连接异常");
             return false;
         } finally {
             com.util.Connection.closeConnection(connection, null, statement);
@@ -107,44 +106,44 @@ public class Data {
         return true;
     }
 
-    public static boolean delete (String sql, Object[] param, String db) {
+    public boolean delete (String sql, Object[] param, String dataDB) {
         Connection connection = null;
         PreparedStatement statement = null;
         try {
-            connection = com.util.Connection.getConnection(db);
+            connection = com.util.Connection.getConnection(dataDB);
             statement = connection.prepareStatement(sql);
             SQLParamHelper.setParam(param, statement);
             return statement.execute();
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("使用当前数据源" + db + "的连接异常");
+            logger.error("使用当前数据源" + dataDB + "的连接异常");
             return false;
         } finally {
             com.util.Connection.closeConnection(connection, null, statement);
         }
     }
 
-    public static int insert (String sql, Object[] param, String db) {
+    public int insert (String sql, Object[] param, String dataDB) {
         Connection connection = null;
         PreparedStatement statement = null;
         int result = -1;
         try {
-            connection = com.util.Connection.getConnection(db);
+            connection = com.util.Connection.getConnection(dataDB);
             statement = connection.prepareStatement(sql);
             SQLParamHelper.setParam(param, statement);
             result = statement.executeUpdate();
             return result;
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("使用当前数据源" + db + "的连接异常");
+            logger.error("使用当前数据源" + dataDB + "的连接异常");
             return result;
         } finally {
             com.util.Connection.closeConnection(connection, null, statement);
         }
     }
 
-    public static <T extends Bean> T GetOne (String sql, Object[] param, Class<T> classEntity) {
-        List<T> object = QueryT(sql, param, classEntity);
+    public <T extends Bean> T GetOne (String sql, Object[] param) {
+        List<T> object = QueryT(sql, param);
         return object == null || object.size() < 1 ? null : object.get(0);
     }
 }
