@@ -1,6 +1,7 @@
 package com.util;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
@@ -12,21 +13,21 @@ public class MyDataSource {
     private static ConcurrentHashMap<String, DataSource> datasource = new ConcurrentHashMap<String, DataSource>();
     private static ConcurrentHashMap<String, ConnectProp> connectProp = new ConcurrentHashMap<String, ConnectProp>();
 
-    public synchronized static javax.sql.DataSource getDataSource (DataSql db) {
-        javax.sql.DataSource dataSource = datasource.get(db);
+    public synchronized static javax.sql.DataSource getDataSource (DataSql dataSql) {
+        javax.sql.DataSource dataSource = datasource.get(dataSql.getDataDB());
         if (dataSource == null) {
             ConnectProp connectProp = null;
-            if (db.isConfig()) {
+            if (dataSql.isConfig()) {
                 //默认从配置文件取
-                connectProp = initConnectProp(db.getDataDB());
+                connectProp = initConnectProp(dataSql.getDataDB());
             } else {
                 //从注解中获取相应的配置信息
-                connectProp = initConnectProp(db);
+                connectProp = initConnectProp(dataSql.getDataDB(), dataSql.getDataIp(), dataSql.getUsername(), dataSql.getPassword());
             }
             if (connectProp != null) {
                 //初始化最新的数据库连接
                 javax.sql.DataSource druidDataSource = setDataSource(connectProp.ip, connectProp.db, connectProp.username, connectProp.password);
-                datasource.put(db.getDataDB(), druidDataSource);
+                datasource.put(dataSql.getDataDB(), druidDataSource);
                 return druidDataSource;
             } else {
                 logger.error("未找到当前的数据源");
@@ -75,15 +76,15 @@ public class MyDataSource {
         }
     }
 
-    public static ConnectProp initConnectProp (DataSql dataSql) {
+    public static ConnectProp initConnectProp (String db, String ip, String usernam, String password) {
         ConnectProp connectProp1 = null;
         try {
-            if (null == connectProp.get(dataSql.getDataDB())) {
-                connectProp1 = new ConnectProp(dataSql.getDataIp(), dataSql.getDataDB(), dataSql.getUsername(), dataSql.getPassword());
-                connectProp.put(dataSql.getDataDB(), connectProp1);
+            if (null == connectProp.get(db)) {
+                connectProp1 = new ConnectProp(ip, db, usernam, password);
+                connectProp.put(db, connectProp1);
                 return connectProp1;
             } else {
-                return connectProp.get(dataSql);
+                return connectProp.get(db);
             }
         } catch (Exception e) {
             e.printStackTrace();

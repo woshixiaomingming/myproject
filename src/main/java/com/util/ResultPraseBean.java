@@ -16,7 +16,7 @@ public class ResultPraseBean {
     private static Logger logger = Logger.getLogger(ResultPraseBean.class);
     private static Map<String, Field> dbTableField = new HashMap<String, Field>();
 
-    public static <T extends Bean> List<T> getResultPraseBean (ResultSet resultSet, Class<T> classEntity, String db) {
+    public static <T extends Bean> List<T> getResultPraseBean (ResultSet resultSet, Class<T> cls, DataSql dataSql) {
         if (resultSet == null) {
             return null;
         }
@@ -27,10 +27,10 @@ public class ResultPraseBean {
             int column = data.getColumnCount();
             dataBean = new ArrayList<T>();
             while (resultSet.next()) {
-                T obj = classEntity.newInstance();
+                T obj = cls.newInstance();
                 for (int i = 0; i < column; i++) {
                     String label = data.getColumnLabel(i + 1) == null ? data.getColumnName(i + 1) : data.getColumnLabel(i + 1);
-                    Field field = getModelField(db, classEntity, label);
+                    Field field = getModelField(dataSql.getDataDB(), dataSql.getClassEntity(), label);
                     if (field == null) {
                         continue;
                     }

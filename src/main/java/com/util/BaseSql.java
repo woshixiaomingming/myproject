@@ -1,11 +1,13 @@
 package com.util;
 
 import com.annototion.DataModel;
+import org.apache.commons.lang3.StringUtils;
 
 public class BaseSql<T extends Bean> extends Data {
 
     public BaseSql() {
-
+        super();
+        init();
     }
 
     private T bean;
@@ -27,11 +29,18 @@ public class BaseSql<T extends Bean> extends Data {
         setClassEntity(cls);
         //获取注解信息
         DataModel dataModel = (DataModel) cls.getAnnotation(DataModel.class);
+        if (StringUtils.isEmpty(dataModel.dateBase())) {
+            throw new NullPointerException("请在bean的注解上配置主库");
+        }
+        setDataDB(dataModel.dateBase());
         //判断是否开启注解
         if (dataModel.isDefealt()) {
-
+            setConfig(true);
+            setDataIp(dataModel.dataIp());
+            setPassword(dataModel.username());
+            setUsername(dataModel.username());
         } else {
-
+            setConfig(false);
         }
     }
 }

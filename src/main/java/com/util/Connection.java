@@ -12,9 +12,9 @@ public class Connection {
 
     private static Logger logger = Logger.getLogger(Connection.class);
 
-    public static java.sql.Connection getConnection (DataSql db) {
+    public static java.sql.Connection getConnection (DataSql dataSql) {
         try {
-            DataSource druidDataSource = MyDataSource.getDataSource(db);
+            DataSource druidDataSource = MyDataSource.getDataSource(dataSql);
             java.sql.Connection connection = druidDataSource.getConnection();
             return connection;
         } catch (Exception e) {

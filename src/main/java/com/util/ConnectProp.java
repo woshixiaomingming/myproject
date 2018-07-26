@@ -2,6 +2,9 @@ package com.util;
 
 import java.io.Serializable;
 
+/**
+ * 数据库配置信息
+ */
 public class ConnectProp implements Serializable {
 
     public String ip;

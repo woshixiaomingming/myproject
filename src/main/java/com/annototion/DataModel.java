@@ -29,6 +29,18 @@ public @interface DataModel {
      * 是否使用默认的数据库和表
      * @return
      */
-    boolean isDefealt() default true;
+    boolean isDefealt() default false;
+
+    /**
+     * 数据库用户名
+     * @return
+     */
+    String username();
+
+    /**
+     * 数据库密码
+     * @return
+     */
+    String password();
 
 }

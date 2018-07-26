@@ -12,39 +12,45 @@ public class Data extends DataSql {
 
     private static Logger logger = Logger.getLogger(Data.class);
 
+    public Data () {
+        super();
+    }
+
+
     public <T extends Bean> List<T> QueryT (String sql, Object[] param) {
-        return QueryT(sql, param, getDataDB(), getClassEntity());
+        return QueryT(sql, param, getClassEntity(), getDataDB(), getDataIp(), getUsername(), getPassword(), isConfig());
     }
 
     public int insert (String sql, Object[] param) {
-        return insert(sql, param, getDataDB());
+        return insert(sql, param, getDataDB(), getDataIp(), getUsername(), getPassword(), isConfig());
     }
 
     public int update (String sql, Object[] param) {
-        return update(sql, param, getDataDB());
+        return update(sql, param, getDataDB(), getDataIp(), getUsername(), getPassword(), isConfig());
     }
 
     public boolean doTrans (List<Allsql> sql) {
-        return doTrans(sql, getDataDB());
+        return doTrans(sql, getDataDB(), getDataIp(), getUsername(), getPassword(), isConfig());
     }
 
-    public <T extends Bean> List<T> QueryT (String sql, Object[] param, String dataDB, Class<T> classEntity) {
+    public <T extends Bean> List<T> QueryT (String sql, Object[] param, Class<T> cls, Object... obj) {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         List<T> query = new ArrayList<T>();
+        DataSql dataSql = DataSql.findDataSql(obj);
         try {
-            connection = com.util.Connection.getConnection(dataDB);
+            connection = com.util.Connection.getConnection(dataSql);
             statement = connection.prepareStatement(sql);
             SQLParamHelper.setParam(param, statement);
             resultSet = statement.executeQuery();
             if (resultSet == null)
                 query = null;
             else
-                query = ResultPraseBean.getResultPraseBean(resultSet, classEntity, dataDB);
+                query = ResultPraseBean.getResultPraseBean(resultSet, cls, dataSql);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("使用当前数据源" + dataDB + "的连接异常");
+            logger.error("使用当前数据源" + dataSql.getDataDB() + "的连接异常");
         } finally {
             com.util.Connection.closeConnection(connection, resultSet, statement);
         }
@@ -58,29 +64,31 @@ public class Data extends DataSql {
      * @param dataDB
      * @return
      */
-    public int update (String sql, Object[] param, String dataDB) {
+    public int update (String sql, Object[] param, Object... obj) {
         Connection connection = null;
         PreparedStatement statement = null;
         int result = -1;
+        DataSql dataSql = DataSql.findDataSql(obj);
         try {
-            connection = com.util.Connection.getConnection(dataDB);
+            connection = com.util.Connection.getConnection(dataSql);
             statement = connection.prepareStatement(sql);
             SQLParamHelper.setParam(param, statement);
             result = statement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("使用当前数据源" + dataDB + "的连接异常");
+            logger.error("使用当前数据源" + dataSql.getDataDB() + "的连接异常");
         } finally {
             com.util.Connection.closeConnection(connection, null, statement);
         }
         return result;
     }
 
-    public boolean doTrans (List<Allsql> sql, String dataDB) {
+    public boolean doTrans (List<Allsql> sql, Object... obj) {
         Connection connection = null;
         PreparedStatement statement = null;
+        DataSql dataSql = DataSql.findDataSql(obj);
         try {
-            connection = com.util.Connection.getConnection(dataDB);
+            connection = com.util.Connection.getConnection(dataSql);
             connection.setAutoCommit(false);
             for (Allsql sqls : sql) {
                  statement = connection.prepareStatement(sqls.getSql());
@@ -98,7 +106,7 @@ public class Data extends DataSql {
             connection.commit();
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("使用当前数据源" + dataDB + "的连接异常");
+            logger.error("使用当前数据源" + dataSql.getDataDB() + "的连接异常");
             return false;
         } finally {
             com.util.Connection.closeConnection(connection, null, statement);
@@ -106,36 +114,38 @@ public class Data extends DataSql {
         return true;
     }
 
-    public boolean delete (String sql, Object[] param, String dataDB) {
+    public boolean delete (String sql, Object[] param, Object... obj) {
         Connection connection = null;
         PreparedStatement statement = null;
+        DataSql dataSql = DataSql.findDataSql(obj);
         try {
-            connection = com.util.Connection.getConnection(dataDB);
+            connection = com.util.Connection.getConnection(dataSql);
             statement = connection.prepareStatement(sql);
             SQLParamHelper.setParam(param, statement);
             return statement.execute();
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("使用当前数据源" + dataDB + "的连接异常");
+            logger.error("使用当前数据源" + dataSql.getDataDB() + "的连接异常");
             return false;
         } finally {
             com.util.Connection.closeConnection(connection, null, statement);
         }
     }
 
-    public int insert (String sql, Object[] param, String dataDB) {
+    public int insert (String sql, Object[] param, Object... obj) {
         Connection connection = null;
         PreparedStatement statement = null;
         int result = -1;
+        DataSql dataSql = DataSql.findDataSql(obj);
         try {
-            connection = com.util.Connection.getConnection(dataDB);
+            connection = com.util.Connection.getConnection(dataSql);
             statement = connection.prepareStatement(sql);
             SQLParamHelper.setParam(param, statement);
             result = statement.executeUpdate();
             return result;
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("使用当前数据源" + dataDB + "的连接异常");
+            logger.error("使用当前数据源" + dataSql.getDataDB() + "的连接异常");
             return result;
         } finally {
             com.util.Connection.closeConnection(connection, null, statement);
