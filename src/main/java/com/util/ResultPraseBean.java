@@ -30,7 +30,7 @@ public class ResultPraseBean {
                 T obj = cls.newInstance();
                 for (int i = 0; i < column; i++) {
                     String label = data.getColumnLabel(i + 1) == null ? data.getColumnName(i + 1) : data.getColumnLabel(i + 1);
-                    Field field = getModelField(dataSql.getDataDB(), dataSql.getClassEntity(), label);
+                    Field field = getModelField(dataSql.getDataDB(), cls, label);
                     if (field == null) {
                         continue;
                     }

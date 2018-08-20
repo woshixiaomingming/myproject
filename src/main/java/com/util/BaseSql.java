@@ -3,6 +3,9 @@ package com.util;
 import com.annototion.DataModel;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 public class BaseSql<T extends Bean> extends Data {
 
     public BaseSql() {
@@ -10,14 +13,10 @@ public class BaseSql<T extends Bean> extends Data {
         init();
     }
 
-    private T bean;
+    private Class<T> cls;
 
-    public T getBean() {
-        return bean;
-    }
-
-    public void setBean(T bean) {
-        this.bean = bean;
+    public Class<T> getCls() {
+        return cls;
     }
 
     /**
@@ -25,7 +24,15 @@ public class BaseSql<T extends Bean> extends Data {
      */
     public void init () {
         //获取当前的注解下的数据
-        Class cls = bean.getClass();
+        Class clss = getClass();
+        Type type = clss.getGenericSuperclass();
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Type[] types = parameterizedType.getActualTypeArguments();
+            this.cls = (Class<T>) types[0];
+        } else {
+            this.cls = (Class<T>) type;
+        }
         setClassEntity(cls);
         //获取注解信息
         DataModel dataModel = (DataModel) cls.getAnnotation(DataModel.class);
@@ -36,11 +43,12 @@ public class BaseSql<T extends Bean> extends Data {
         //判断是否开启注解
         if (dataModel.isDefealt()) {
             setConfig(true);
+            if (StringUtils.isEmpty(dataModel.dataIp()) || StringUtils.isEmpty(dataModel.password()) || StringUtils.isEmpty(dataModel.username())) {
+                throw new NullPointerException("请在bean的注解上配置主库");
+            }
             setDataIp(dataModel.dataIp());
-            setPassword(dataModel.username());
+            setPassword(dataModel.password());
             setUsername(dataModel.username());
-        } else {
-            setConfig(false);
         }
     }
 }

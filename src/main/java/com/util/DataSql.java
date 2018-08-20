@@ -79,7 +79,7 @@ public class DataSql<T extends Bean> {
         String password = null;
         try {
             db = (String) obj[0];
-            isConfig = Boolean.valueOf((String) obj[4]);
+            isConfig = (Boolean) obj[4];
             if (isConfig) {
                 ip = (String) obj[1];
                 username = (String) obj[2];

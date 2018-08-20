@@ -17,7 +17,7 @@ public class MyDataSource {
         javax.sql.DataSource dataSource = datasource.get(dataSql.getDataDB());
         if (dataSource == null) {
             ConnectProp connectProp = null;
-            if (dataSql.isConfig()) {
+            if (!dataSql.isConfig()) {
                 //默认从配置文件取
                 connectProp = initConnectProp(dataSql.getDataDB());
             } else {
